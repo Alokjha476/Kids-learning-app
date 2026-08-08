@@ -579,6 +579,8 @@ function submitEnglishAnswer(chosenIdx, correctIdx, btnEl) {
 
 function renderHindiView(container) {
   const data = KIDS_DATA.hindi[currentGrade];
+  const swarList = data.swar || KIDS_DATA.hindi.lkg.swar;
+  const vyanjanList = data.vyanjan || KIDS_DATA.hindi.ukg.vyanjan;
 
   if (currentSection === 'hindi_exercise') {
     renderHindiExercise(container);
@@ -593,7 +595,7 @@ function renderHindiView(container) {
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        ${data.swar.map(s => `
+        ${swarList.map(s => `
           <div onclick="speakText('${s.letter} से ${s.word}', 'hi-IN'); openTracingModal('${s.letter}', '${s.word}', '${s.emoji}')"
                class="bg-white rounded-3xl p-4 text-center border-2 border-rose-200 shadow-sm card-bounce cursor-pointer group hover:border-rose-400 flex flex-col items-center">
             <span class="text-5xl mb-2 group-hover:scale-110 transition-transform">${s.emoji}</span>
@@ -608,30 +610,42 @@ function renderHindiView(container) {
     container.innerHTML = `
       <div class="mb-6 text-center">
         <h2 class="text-2xl font-black text-rose-700 font-hindi">हिंदी अक्षर अभ्यास (Writing Canvas)</h2>
-        <p class="text-sm text-slate-500 font-hindi">अक्षर चुनकर लिखने का अभ्यास करें!</p>
+        <p class="text-sm text-slate-500 font-hindi">अक्षर चुनकर लिखने का अभ्यास करें (स्वर व व्यंजन)!</p>
       </div>
-      <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 max-w-3xl mx-auto">
-        ${data.swar.map(s => `
-          <button onclick="openTracingModal('${s.letter}', '${s.word}', '${s.emoji}')"
-                  class="bg-white hover:bg-rose-50 text-rose-700 border-2 border-rose-200 rounded-2xl py-3 font-black text-3xl font-hindi shadow-sm card-bounce">
-            ${s.letter}
-          </button>
-        `).join('')}
+      <div class="space-y-4 max-w-3xl mx-auto">
+        <h3 class="text-lg font-black text-rose-600 font-hindi">स्वर (अ से अः)</h3>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          ${swarList.map(s => `
+            <button onclick="openTracingModal('${s.letter}', '${s.word}', '${s.emoji}')"
+                    class="bg-white hover:bg-rose-50 text-rose-700 border-2 border-rose-200 rounded-2xl py-3 font-black text-3xl font-hindi shadow-sm card-bounce">
+              ${s.letter}
+            </button>
+          `).join('')}
+        </div>
+        <h3 class="text-lg font-black text-orange-600 font-hindi mt-4">व्यंजन (क से ज्ञ)</h3>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          ${vyanjanList.map(v => `
+            <button onclick="openTracingModal('${v.letter}', '${v.word}', '${v.emoji}')"
+                    class="bg-white hover:bg-orange-50 text-orange-700 border-2 border-orange-200 rounded-2xl py-3 font-black text-3xl font-hindi shadow-sm card-bounce">
+              ${v.letter}
+            </button>
+          `).join('')}
+        </div>
       </div>
     `;
   } else if (currentSection === 'vyanjan') {
     container.innerHTML = `
       <div class="mb-6">
-        <h2 class="text-2xl font-black text-orange-600 font-hindi">${data.title} - व्यंजन (Vyanjan)</h2>
-        <p class="text-sm text-slate-500 font-medium font-hindi">क से ज्ञ तक के व्यंजन और उनके उदाहरण</p>
+        <h2 class="text-2xl font-black text-orange-600 font-hindi">${data.title} - व्यंजन (Vyanjan क से ज्ञ)</h2>
+        <p class="text-sm text-slate-500 font-medium font-hindi">क से ज्ञ तक के व्यंजन, उच्चारण और लिखने का अभ्यास!</p>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-        ${data.vyanjan.map(v => `
-          <div onclick="speakText('${v.letter} से ${v.word}', 'hi-IN')"
+        ${vyanjanList.map(v => `
+          <div onclick="speakText('${v.letter} से ${v.word}', 'hi-IN'); openTracingModal('${v.letter}', '${v.word}', '${v.emoji}')"
                class="bg-white rounded-2xl p-3 text-center border-2 border-orange-200 shadow-sm card-bounce cursor-pointer hover:border-orange-400">
             <span class="text-3xl block mb-1">${v.emoji}</span>
             <span class="text-3xl font-extrabold text-orange-600 font-hindi">${v.letter}</span>
-            <span class="text-xs font-bold text-slate-700 font-hindi block mt-1">${v.word}</span>
+            <span class="text-xs font-bold text-slate-700 font-hindi block mt-1">${v.letter} से ${v.word}</span>
           </div>
         `).join('')}
       </div>

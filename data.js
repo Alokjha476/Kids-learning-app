@@ -121,6 +121,7 @@ const KIDS_DATA = {
       sections: [
         { id: "hindi_exercise", name: "हिंदी अभ्यास (Practice Exercise) ✏️", icon: "📝" },
         { id: "swar", name: "स्वर (अ से अः)", icon: "🗣️" },
+        { id: "vyanjan", name: "व्यंजन (क से ज्ञ)", icon: "🔡" },
         { id: "swar_words", name: "चित्र और शब्द", icon: "🖼️" },
         { id: "hindi_tracing", name: "अक्षर ट्रेसिंग (Tracing)", icon: "✍️" }
       ],
@@ -145,6 +146,7 @@ const KIDS_DATA = {
       subtitle: "व्यंजन (Vyanjan) तथा २ व ३ अक्षर वाले शब्द",
       sections: [
         { id: "hindi_exercise", name: "हिंदी अभ्यास (Practice Exercise) ✏️", icon: "📝" },
+        { id: "swar", name: "स्वर (अ से अः)", icon: "🗣️" },
         { id: "vyanjan", name: "व्यंजन (क से ज्ञ)", icon: "🔡" },
         { id: "words2", name: "२ अक्षर शब्द", icon: "2️⃣" },
         { id: "words3", name: "३ अक्षर शब्द", icon: "3️⃣" }
