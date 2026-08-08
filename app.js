@@ -447,61 +447,118 @@ let englishScore = 0;
 function generateEnglishQuestions() {
   englishScore = 0;
   currentEngQIdx = 0;
-  englishQuestions = [
-    {
-      question: "What is the missing first letter for 🍎 _ p p l e?",
-      options: ["A", "B", "C", "D"],
-      answer: 0,
-      speak: "What is the missing first letter for Apple?",
-      emoji: "🍎"
-    },
-    {
-      question: "What is the missing first letter for ⚽ _ a l l?",
-      options: ["B", "F", "P", "S"],
-      answer: 0,
-      speak: "What is the missing first letter for Ball?",
-      emoji: "⚽"
-    },
-    {
-      question: "What is the missing first letter for 🐱 _ a t?",
-      options: ["C", "K", "T", "M"],
-      answer: 0,
-      speak: "What is the missing first letter for Cat?",
-      emoji: "🐱"
-    },
-    {
-      question: "Which word starts with the /b/ sound?",
-      options: ["Ball ⚽", "Cat 🐱", "Sun ☀️", "Hat 🎩"],
-      answer: 0,
-      speak: "Which word starts with the buh sound?",
-      emoji: "🔊"
-    },
-    {
-      question: "What is the OPPOSITE of HOT ☕?",
-      options: ["Cold 🧊", "Big 🐘", "Happy 😄", "Fast 🐆"],
-      answer: 0,
-      speak: "What is the opposite of HOT?",
-      emoji: "☕"
+  englishQuestions = [];
+
+  const alphabets = KIDS_DATA.english.lkg.alphabets;
+  const cvcList = [];
+  KIDS_DATA.english.ukg.cvcWords.forEach(cat => cvcList.push(...cat.items));
+  const opposites = KIDS_DATA.english.ukg.opposites;
+  const actions = KIDS_DATA.english.ukg.actions;
+
+  // 1. 26 Missing First Letter questions (A-Z)
+  alphabets.forEach(item => {
+    const letter = item.letter;
+    const word = item.word;
+    const emoji = item.emoji;
+    const blankWord = `_ ${word.substring(1)}`;
+
+    const optionsSet = new Set([letter]);
+    while (optionsSet.size < 4) {
+      const randChar = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+      if (randChar !== letter) optionsSet.add(randChar);
     }
-  ];
-  if (currentGrade === 'ukg') {
-    englishQuestions.push(
-      {
-        question: "Find the Action Word for 🏃",
-        options: ["RUN", "SLEEP", "EAT", "READ"],
-        answer: 0,
-        speak: "Find the action word for running",
-        emoji: "🏃"
-      },
-      {
-        question: "Complete the 3-letter CVC word: C _ T 🐱",
-        options: ["A", "E", "I", "O"],
-        answer: 0,
-        speak: "Complete the word CAT",
-        emoji: "🐱"
-      }
-    );
-  }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    englishQuestions.push({
+      question: `What is the missing first letter for ${emoji} ${blankWord}?`,
+      options: options,
+      answer: options.indexOf(letter),
+      speak: `What is the missing first letter for ${word}?`,
+      emoji: emoji
+    });
+  });
+
+  // 2. 26 Phonics Sound Matching questions
+  alphabets.forEach(item => {
+    const letter = item.letter;
+    const word = item.word;
+    const emoji = item.emoji;
+
+    const optionsSet = new Set([`${word} ${emoji}`]);
+    while (optionsSet.size < 4) {
+      const rand = alphabets[Math.floor(Math.random() * alphabets.length)];
+      if (rand.word !== word) optionsSet.add(`${rand.word} ${rand.emoji}`);
+    }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    englishQuestions.push({
+      question: `Which word starts with letter '${letter}' /${item.phonic}/ sound?`,
+      options: options,
+      answer: options.indexOf(`${word} ${emoji}`),
+      speak: `Which word starts with letter ${letter}?`,
+      emoji: "🔊"
+    });
+  });
+
+  // 3. 25 CVC 3-letter word completion questions
+  cvcList.forEach(w => {
+    const word = w.word;
+    const emoji = w.emoji;
+    const blankCvc = `${word[0]} _ ${word[2]}`;
+    const targetVowel = word[1];
+
+    const optionsSet = new Set([targetVowel]);
+    const vowelsArr = ['A', 'E', 'I', 'O', 'U'];
+    vowelsArr.forEach(v => optionsSet.add(v));
+    const options = Array.from(optionsSet).slice(0, 4).sort(() => Math.random() - 0.5);
+
+    englishQuestions.push({
+      question: `Complete the 3-letter word: ${blankCvc} ${emoji}`,
+      options: options,
+      answer: options.indexOf(targetVowel),
+      speak: `Complete the word ${word}`,
+      emoji: emoji
+    });
+  });
+
+  // 4. 15 Opposites matching questions
+  opposites.forEach(op => {
+    const optionsSet = new Set([`${op.word2} ${op.emoji2}`]);
+    while (optionsSet.size < 4) {
+      const rand = opposites[Math.floor(Math.random() * opposites.length)];
+      if (rand.word2 !== op.word2) optionsSet.add(`${rand.word2} ${rand.emoji2}`);
+    }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    englishQuestions.push({
+      question: `What is the OPPOSITE of ${op.word1} ${op.emoji1}?`,
+      options: options,
+      answer: options.indexOf(`${op.word2} ${op.emoji2}`),
+      speak: `What is the opposite of ${op.word1}?`,
+      emoji: op.emoji1
+    });
+  });
+
+  // 5. 10 Action words questions
+  actions.forEach(act => {
+    const optionsSet = new Set([act.word]);
+    while (optionsSet.size < 4) {
+      const rand = actions[Math.floor(Math.random() * actions.length)];
+      if (rand.word !== act.word) optionsSet.add(rand.word);
+    }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    englishQuestions.push({
+      question: `Find the Action Word for ${act.emoji} (${act.description})`,
+      options: options,
+      answer: options.indexOf(act.word),
+      speak: `Find the action word for ${act.word}`,
+      emoji: act.emoji
+    });
+  });
+
+  // Shuffle for 100+ random questions
+  englishQuestions.sort(() => Math.random() - 0.5);
 }
 
 function renderEnglishExercise(container) {
@@ -688,61 +745,104 @@ let hindiScore = 0;
 function generateHindiQuestions() {
   hindiScore = 0;
   currentHindiQIdx = 0;
-  hindiQuestions = [
-    {
-      question: "अनार 🍎 किस स्वर अक्षर से शुरू होता है?",
-      options: ["अ", "आ", "इ", "ई"],
-      answer: 0,
-      speak: "अनार किस स्वर अक्षर से शुरू होता है?",
-      emoji: "🍎"
-    },
-    {
-      question: "आम 🥭 किस स्वर अक्षर से शुरू होता है?",
-      options: ["आ", "अ", "उ", "ए"],
-      answer: 0,
-      speak: "आम किस स्वर अक्षर से शुरू होता है?",
-      emoji: "🥭"
-    },
-    {
-      question: "कमल 🪷 किस व्यंजन से शुरू होता है?",
-      options: ["क", "ख", "ग", "घ"],
-      answer: 0,
-      speak: "कमल किस व्यंजन से शुरू होता है?",
-      emoji: "🪷"
-    },
-    {
-      question: "चित्र 𚚰 देखकर सही शब्द चुनें: 🚰",
-      options: ["नल", "फल", "घर", "बस"],
-      answer: 0,
-      speak: "चित्र देखकर सही शब्द चुनें",
-      emoji: "🚰"
-    },
-    {
-      question: "चित्र देखकर सही शब्द चुनें: 🍎",
-      options: ["फल", "नल", "जल", "खत"],
-      answer: 0,
-      speak: "चित्र देखकर सही शब्द चुनें",
-      emoji: "🍎"
+  hindiQuestions = [];
+
+  const swarList = KIDS_DATA.hindi.lkg.swar;
+  const vyanjanList = KIDS_DATA.hindi.ukg.vyanjan;
+  const words2 = KIDS_DATA.hindi.ukg.words2Letter;
+  const words3 = KIDS_DATA.hindi.ukg.words3Letter;
+
+  // 1. Swar (अ से अः) questions
+  swarList.forEach(s => {
+    if (s.letter === "अः") return;
+    const optionsSet = new Set([s.letter]);
+    while (optionsSet.size < 4) {
+      const rand = swarList[Math.floor(Math.random() * swarList.length)];
+      if (rand.letter !== s.letter) optionsSet.add(rand.letter);
     }
-  ];
-  if (currentGrade === 'ukg') {
-    hindiQuestions.push(
-      {
-        question: "घर 🏠 किस व्यंजन से शुरू होता है?",
-        options: ["घ", "ग", "त", "न"],
-        answer: 0,
-        speak: "घर किस व्यंजन से शुरू होता है?",
-        emoji: "🏠"
-      },
-      {
-        question: "चित्र देखकर सही शब्द चुनें: 🚌",
-        options: ["बस", "खत", "जल", "जग"],
-        answer: 0,
-        speak: "चित्र देखकर सही शब्द चुनें",
-        emoji: "🚌"
-      }
-    );
-  }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    hindiQuestions.push({
+      question: `${s.word} ${s.emoji} किस स्वर अक्षर से शुरू होता है?`,
+      options: options,
+      answer: options.indexOf(s.letter),
+      speak: `${s.word} किस स्वर अक्षर से शुरू होता है?`,
+      emoji: s.emoji
+    });
+
+    const wordOptionsSet = new Set([`${s.word} ${s.emoji}`]);
+    while (wordOptionsSet.size < 4) {
+      const rand = swarList[Math.floor(Math.random() * swarList.length)];
+      if (rand.word !== s.word) wordOptionsSet.add(`${rand.word} ${rand.emoji}`);
+    }
+    const wordOptions = Array.from(wordOptionsSet).sort(() => Math.random() - 0.5);
+
+    hindiQuestions.push({
+      question: `'${s.letter}' से कौन सा शब्द शुरू होता है?`,
+      options: wordOptions,
+      answer: wordOptions.indexOf(`${s.word} ${s.emoji}`),
+      speak: `${s.letter} से कौन सा शब्द शुरू होता है?`,
+      emoji: "🗣️"
+    });
+  });
+
+  // 2. Vyanjan (क से ज्ञ) questions
+  vyanjanList.forEach(v => {
+    if (v.word === "खाली" || v.word === "Blank") return;
+    const optionsSet = new Set([v.letter]);
+    while (optionsSet.size < 4) {
+      const rand = vyanjanList[Math.floor(Math.random() * vyanjanList.length)];
+      if (rand.letter !== v.letter && rand.word !== "खाली") optionsSet.add(rand.letter);
+    }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    hindiQuestions.push({
+      question: `${v.word} ${v.emoji} किस व्यंजन से शुरू होता है?`,
+      options: options,
+      answer: options.indexOf(v.letter),
+      speak: `${v.word} किस व्यंजन से शुरू होता है?`,
+      emoji: v.emoji
+    });
+  });
+
+  // 3. 2-Letter Words picture match questions
+  words2.forEach(w => {
+    const optionsSet = new Set([w.word]);
+    while (optionsSet.size < 4) {
+      const rand = words2[Math.floor(Math.random() * words2.length)];
+      if (rand.word !== w.word) optionsSet.add(rand.word);
+    }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    hindiQuestions.push({
+      question: `चित्र ${w.emoji} देखकर सही २-अक्षर शब्द चुनें:`,
+      options: options,
+      answer: options.indexOf(w.word),
+      speak: `चित्र देखकर सही शब्द चुनें`,
+      emoji: w.emoji
+    });
+  });
+
+  // 4. 3-Letter Words picture match questions
+  words3.forEach(w => {
+    const optionsSet = new Set([w.word]);
+    while (optionsSet.size < 4) {
+      const rand = words3[Math.floor(Math.random() * words3.length)];
+      if (rand.word !== w.word) optionsSet.add(rand.word);
+    }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    hindiQuestions.push({
+      question: `चित्र ${w.emoji} देखकर सही ३-अक्षर शब्द चुनें:`,
+      options: options,
+      answer: options.indexOf(w.word),
+      speak: `चित्र देखकर सही शब्द चुनें`,
+      emoji: w.emoji
+    });
+  });
+
+  // Shuffle for 100+ random questions
+  hindiQuestions.sort(() => Math.random() - 0.5);
 }
 
 function renderHindiExercise(container) {
@@ -1006,35 +1106,35 @@ function generateMathQuestions() {
 
   const ops = selectedMathOp === 'all' ? ['+', '-', '*', '/'] : [selectedMathOp];
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 100; i++) {
     const chosenOp = ops[Math.floor(Math.random() * ops.length)];
     let n1, n2, ans, text, speakTextStr, opSymbol;
 
     if (chosenOp === '+') {
-      n1 = Math.floor(Math.random() * 8) + 1;
-      n2 = Math.floor(Math.random() * 8) + 1;
+      n1 = Math.floor(Math.random() * 10) + 1;
+      n2 = Math.floor(Math.random() * 10) + 1;
       ans = n1 + n2;
       opSymbol = '+';
       text = `${n1} + ${n2} = ?`;
       speakTextStr = `What is ${n1} plus ${n2}?`;
     } else if (chosenOp === '-') {
-      n1 = Math.floor(Math.random() * 8) + 3;
+      n1 = Math.floor(Math.random() * 10) + 4;
       n2 = Math.floor(Math.random() * (n1 - 1)) + 1;
       ans = n1 - n2;
       opSymbol = '-';
       text = `${n1} - ${n2} = ?`;
       speakTextStr = `What is ${n1} minus ${n2}?`;
     } else if (chosenOp === '*') {
-      n1 = Math.floor(Math.random() * 5) + 1;
-      n2 = Math.floor(Math.random() * 4) + 1;
+      n1 = Math.floor(Math.random() * 6) + 1;
+      n2 = Math.floor(Math.random() * 5) + 1;
       ans = n1 * n2;
       opSymbol = '×';
       text = `${n1} × ${n2} = ?`;
       speakTextStr = `What is ${n1} multiplied by ${n2}?`;
     } else {
       // Division
-      n2 = Math.floor(Math.random() * 4) + 1;
-      ans = Math.floor(Math.random() * 5) + 1;
+      n2 = Math.floor(Math.random() * 5) + 1;
+      ans = Math.floor(Math.random() * 6) + 1;
       n1 = n2 * ans;
       opSymbol = '÷';
       text = `${n1} ÷ ${n2} = ?`;
@@ -1178,77 +1278,23 @@ function generateQuizQuestions() {
   currentQuestionIdx = 0;
   quizQuestions = [];
 
-  if (currentGrade === 'lkg') {
-    // 5 fun questions for LKG
-    quizQuestions = [
-      {
-        question: "Which letter does 'Apple' 🍎 start with?",
-        options: ["A", "B", "C", "D"],
-        answer: 0,
-        speak: "Which letter does Apple start with?"
-      },
-      {
-        question: "How many stars are here? ⭐ ⭐ ⭐",
-        options: ["2", "3", "5", "1"],
-        answer: 1,
-        speak: "How many stars are here?"
-      },
-      {
-        question: "हिंदी में 'अ' से क्या होता है?",
-        options: ["आम", "अनार", "इमली", "कमल"],
-        answer: 1,
-        speak: "अ से क्या होता है?",
-        lang: 'hi-IN'
-      },
-      {
-        question: "What shape is a round wheel 🔴?",
-        options: ["Triangle", "Square", "Circle", "Star"],
-        answer: 2,
-        speak: "What shape is a round wheel?"
-      },
-      {
-        question: "What animal says 'Woof Woof' 🐶?",
-        options: ["Cat", "Dog", "Fish", "Lion"],
-        answer: 1,
-        speak: "What animal says Woof Woof?"
-      }
-    ];
-  } else {
-    // 5 fun questions for UKG
-    quizQuestions = [
-      {
-        question: "What is 3 + 2 = ? 🍎🍎🍎 + 🍎🍎",
-        options: ["4", "5", "6", "3"],
-        answer: 1,
-        speak: "What is 3 plus 2?"
-      },
-      {
-        question: "Which one is a Vowel letter?",
-        options: ["B", "E", "F", "G"],
-        answer: 1,
-        speak: "Which one is a Vowel letter?"
-      },
-      {
-        question: "क से क्या होता है? 🪷",
-        options: ["कमल", "घर", "नल", "फल"],
-        answer: 0,
-        speak: "क से क्या होता है?",
-        lang: 'hi-IN'
-      },
-      {
-        question: "What is the OPPOSITE of BIG 🐘?",
-        options: ["Tall", "Hot", "SMALL 🐜", "Happy"],
-        answer: 2,
-        speak: "What is the opposite of BIG?"
-      },
-      {
-        question: "Complete the 3-letter CVC word: C _ T 🐱",
-        options: ["A", "E", "O", "U"],
-        answer: 0,
-        speak: "Complete the word CAT"
-      }
-    ];
-  }
+  generateEnglishQuestions();
+  generateHindiQuestions();
+  generateMathQuestions();
+
+  const allBank = [
+    ...englishQuestions,
+    ...hindiQuestions.map(q => ({ ...q, lang: 'hi-IN' })),
+    ...mathQuestions.map(q => ({
+      question: q.text,
+      options: q.options.map(String),
+      answer: q.options.indexOf(q.ans),
+      speak: q.speakTextStr
+    }))
+  ];
+
+  allBank.sort(() => Math.random() - 0.5);
+  quizQuestions = allBank.slice(0, 100);
 }
 
 function renderQuizView(container) {
