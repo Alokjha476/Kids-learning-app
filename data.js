@@ -6,6 +6,7 @@ const KIDS_DATA = {
       title: "LKG English",
       subtitle: "Alphabets, Phonics & Letters Tracing",
       sections: [
+        { id: "english_exercise", name: "English Practice Exercise ✏️", icon: "📝" },
         { id: "alphabet", name: "Alphabet (A-Z)", icon: "🔤" },
         { id: "phonics", name: "Phonics & Words", icon: "🍎" },
         { id: "sight_words", name: "Simple Sight Words", icon: "👀" },
@@ -60,6 +61,7 @@ const KIDS_DATA = {
       title: "UKG English",
       subtitle: "3-Letter Words, Vowels, Opposites & Sentences",
       sections: [
+        { id: "english_exercise", name: "English Practice Exercise ✏️", icon: "📝" },
         { id: "cvc", name: "3-Letter Words (CVC)", icon: "🔤" },
         { id: "vowels", name: "Vowels (A, E, I, O, U)", icon: "🌟" },
         { id: "opposites", name: "Opposites Words", icon: "↔️" },
@@ -117,6 +119,7 @@ const KIDS_DATA = {
       title: "एल०के०जी० हिंदी (LKG Hindi)",
       subtitle: "स्वर (Swar - Vowels) और अक्षर अभ्यास",
       sections: [
+        { id: "hindi_exercise", name: "हिंदी अभ्यास (Practice Exercise) ✏️", icon: "📝" },
         { id: "swar", name: "स्वर (अ से अः)", icon: "🗣️" },
         { id: "swar_words", name: "चित्र और शब्द", icon: "🖼️" },
         { id: "hindi_tracing", name: "अक्षर ट्रेसिंग (Tracing)", icon: "✍️" }
@@ -141,6 +144,7 @@ const KIDS_DATA = {
       title: "यू०के०जी० हिंदी (UKG Hindi)",
       subtitle: "व्यंजन (Vyanjan) तथा २ व ३ अक्षर वाले शब्द",
       sections: [
+        { id: "hindi_exercise", name: "हिंदी अभ्यास (Practice Exercise) ✏️", icon: "📝" },
         { id: "vyanjan", name: "व्यंजन (क से ज्ञ)", icon: "🔡" },
         { id: "words2", name: "२ अक्षर शब्द", icon: "2️⃣" },
         { id: "words3", name: "३ अक्षर शब्द", icon: "3️⃣" }

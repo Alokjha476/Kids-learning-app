@@ -278,7 +278,9 @@ function renderContent() {
 function renderEnglishView(container) {
   const data = KIDS_DATA.english[currentGrade];
   
-  if (currentSection === 'alphabet') {
+  if (currentSection === 'english_exercise') {
+    renderEnglishExercise(container);
+  } else if (currentSection === 'alphabet') {
     container.innerHTML = `
       <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-2 border-b border-slate-200 pb-4">
         <div>
@@ -437,12 +439,150 @@ function renderEnglishView(container) {
   }
 }
 
+// --- ENGLISH EXERCISE ENGINE ---
+let englishQuestions = [];
+let currentEngQIdx = 0;
+let englishScore = 0;
+
+function generateEnglishQuestions() {
+  englishScore = 0;
+  currentEngQIdx = 0;
+  englishQuestions = [
+    {
+      question: "What is the missing first letter for 🍎 _ p p l e?",
+      options: ["A", "B", "C", "D"],
+      answer: 0,
+      speak: "What is the missing first letter for Apple?",
+      emoji: "🍎"
+    },
+    {
+      question: "What is the missing first letter for ⚽ _ a l l?",
+      options: ["B", "F", "P", "S"],
+      answer: 0,
+      speak: "What is the missing first letter for Ball?",
+      emoji: "⚽"
+    },
+    {
+      question: "What is the missing first letter for 🐱 _ a t?",
+      options: ["C", "K", "T", "M"],
+      answer: 0,
+      speak: "What is the missing first letter for Cat?",
+      emoji: "🐱"
+    },
+    {
+      question: "Which word starts with the /b/ sound?",
+      options: ["Ball ⚽", "Cat 🐱", "Sun ☀️", "Hat 🎩"],
+      answer: 0,
+      speak: "Which word starts with the buh sound?",
+      emoji: "🔊"
+    },
+    {
+      question: "What is the OPPOSITE of HOT ☕?",
+      options: ["Cold 🧊", "Big 🐘", "Happy 😄", "Fast 🐆"],
+      answer: 0,
+      speak: "What is the opposite of HOT?",
+      emoji: "☕"
+    }
+  ];
+  if (currentGrade === 'ukg') {
+    englishQuestions.push(
+      {
+        question: "Find the Action Word for 🏃",
+        options: ["RUN", "SLEEP", "EAT", "READ"],
+        answer: 0,
+        speak: "Find the action word for running",
+        emoji: "🏃"
+      },
+      {
+        question: "Complete the 3-letter CVC word: C _ T 🐱",
+        options: ["A", "E", "I", "O"],
+        answer: 0,
+        speak: "Complete the word CAT",
+        emoji: "🐱"
+      }
+    );
+  }
+}
+
+function renderEnglishExercise(container) {
+  if (englishQuestions.length === 0) generateEnglishQuestions();
+
+  if (currentEngQIdx >= englishQuestions.length) {
+    playFanfareSound();
+    triggerConfetti();
+    addStars(5);
+
+    container.innerHTML = `
+      <div class="text-center py-10 max-w-md mx-auto">
+        <div class="text-7xl mb-4 animate-bounce">🔤</div>
+        <h2 class="text-3xl font-black text-blue-600 mb-2">English Exercise Complete!</h2>
+        <p class="text-slate-600 font-semibold mb-6">You answered ${englishScore} out of ${englishQuestions.length} correctly! You earned +5 Bonus Stars! ⭐</p>
+        <button onclick="generateEnglishQuestions(); renderEnglishExercise(document.getElementById('contentContainer'))"
+                class="btn-3d bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-extrabold text-lg px-8 py-3.5 rounded-2xl shadow-lg hover:brightness-110">
+          Try Again ✏️
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  const q = englishQuestions[currentEngQIdx];
+  speakText(q.speak);
+
+  container.innerHTML = `
+    <div class="max-w-xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs font-bold text-slate-500">Question ${currentEngQIdx + 1} of ${englishQuestions.length}</span>
+        <span class="text-xs font-black text-amber-600 bg-amber-100 px-3 py-1 rounded-full">⭐ Score: ${englishScore}</span>
+      </div>
+
+      <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl p-6 text-center text-white shadow-xl mb-6 relative">
+        <span class="text-6xl block mb-2">${q.emoji}</span>
+        <h3 class="text-2xl font-black mb-3">${q.question}</h3>
+        <button onclick="speakText('${q.speak}')" class="px-4 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition-colors inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-volume-high"></i> Replay Sound
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        ${q.options.map((opt, idx) => `
+          <button onclick="submitEnglishAnswer(${idx}, ${q.answer}, this)"
+                  class="bg-white hover:bg-blue-50 text-slate-800 font-black text-2xl py-5 rounded-2xl border-2 border-slate-200 shadow-sm card-bounce">
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function submitEnglishAnswer(chosenIdx, correctIdx, btnEl) {
+  if (chosenIdx === correctIdx) {
+    englishScore++;
+    btnEl.className = "bg-emerald-500 text-white font-black text-2xl py-5 rounded-2xl border-2 border-emerald-600 shadow-lg scale-105";
+    playSuccessSound();
+    addStars(1);
+    speakText("Superb!");
+  } else {
+    btnEl.className = "bg-rose-500 text-white font-black text-2xl py-5 rounded-2xl border-2 border-rose-600 shadow-lg animate-bounce";
+    playErrorSound();
+    speakText("Try again!");
+  }
+
+  setTimeout(() => {
+    currentEngQIdx++;
+    renderEnglishExercise(document.getElementById('contentContainer'));
+  }, 1200);
+}
+
 // --- 2. HINDI VIEW RENDERER ---
 
 function renderHindiView(container) {
   const data = KIDS_DATA.hindi[currentGrade];
 
-  if (currentSection === 'swar') {
+  if (currentSection === 'hindi_exercise') {
+    renderHindiExercise(container);
+  } else if (currentSection === 'swar') {
     container.innerHTML = `
       <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-2 border-b border-slate-200 pb-4">
         <div>
@@ -524,6 +664,142 @@ function renderHindiView(container) {
       </div>
     `;
   }
+}
+
+// --- HINDI EXERCISE ENGINE ---
+let hindiQuestions = [];
+let currentHindiQIdx = 0;
+let hindiScore = 0;
+
+function generateHindiQuestions() {
+  hindiScore = 0;
+  currentHindiQIdx = 0;
+  hindiQuestions = [
+    {
+      question: "अनार 🍎 किस स्वर अक्षर से शुरू होता है?",
+      options: ["अ", "आ", "इ", "ई"],
+      answer: 0,
+      speak: "अनार किस स्वर अक्षर से शुरू होता है?",
+      emoji: "🍎"
+    },
+    {
+      question: "आम 🥭 किस स्वर अक्षर से शुरू होता है?",
+      options: ["आ", "अ", "उ", "ए"],
+      answer: 0,
+      speak: "आम किस स्वर अक्षर से शुरू होता है?",
+      emoji: "🥭"
+    },
+    {
+      question: "कमल 🪷 किस व्यंजन से शुरू होता है?",
+      options: ["क", "ख", "ग", "घ"],
+      answer: 0,
+      speak: "कमल किस व्यंजन से शुरू होता है?",
+      emoji: "🪷"
+    },
+    {
+      question: "चित्र 𚚰 देखकर सही शब्द चुनें: 🚰",
+      options: ["नल", "फल", "घर", "बस"],
+      answer: 0,
+      speak: "चित्र देखकर सही शब्द चुनें",
+      emoji: "🚰"
+    },
+    {
+      question: "चित्र देखकर सही शब्द चुनें: 🍎",
+      options: ["फल", "नल", "जल", "खत"],
+      answer: 0,
+      speak: "चित्र देखकर सही शब्द चुनें",
+      emoji: "🍎"
+    }
+  ];
+  if (currentGrade === 'ukg') {
+    hindiQuestions.push(
+      {
+        question: "घर 🏠 किस व्यंजन से शुरू होता है?",
+        options: ["घ", "ग", "त", "न"],
+        answer: 0,
+        speak: "घर किस व्यंजन से शुरू होता है?",
+        emoji: "🏠"
+      },
+      {
+        question: "चित्र देखकर सही शब्द चुनें: 🚌",
+        options: ["बस", "खत", "जल", "जग"],
+        answer: 0,
+        speak: "चित्र देखकर सही शब्द चुनें",
+        emoji: "🚌"
+      }
+    );
+  }
+}
+
+function renderHindiExercise(container) {
+  if (hindiQuestions.length === 0) generateHindiQuestions();
+
+  if (currentHindiQIdx >= hindiQuestions.length) {
+    playFanfareSound();
+    triggerConfetti();
+    addStars(5);
+
+    container.innerHTML = `
+      <div class="text-center py-10 max-w-md mx-auto">
+        <div class="text-7xl mb-4 animate-bounce">🕉️</div>
+        <h2 class="text-3xl font-black text-rose-600 mb-2 font-hindi">हिंदी अभ्यास पूर्ण हुआ!</h2>
+        <p class="text-slate-600 font-semibold mb-6 font-hindi">आपने ${hindiQuestions.length} में से ${hindiScore} सही उत्तर दिए! आपको +5 Stars मिले! ⭐</p>
+        <button onclick="generateHindiQuestions(); renderHindiExercise(document.getElementById('contentContainer'))"
+                class="btn-3d bg-gradient-to-r from-rose-500 to-pink-600 text-white font-extrabold text-lg px-8 py-3.5 rounded-2xl shadow-lg hover:brightness-110 font-hindi">
+          पुनः प्रयास करें ✏️
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  const q = hindiQuestions[currentHindiQIdx];
+  speakText(q.speak, 'hi-IN');
+
+  container.innerHTML = `
+    <div class="max-w-xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs font-bold text-slate-500 font-hindi">प्रश्न ${currentHindiQIdx + 1} / ${hindiQuestions.length}</span>
+        <span class="text-xs font-black text-amber-600 bg-amber-100 px-3 py-1 rounded-full font-hindi">⭐ Score: ${hindiScore}</span>
+      </div>
+
+      <div class="bg-gradient-to-br from-rose-500 to-pink-600 rounded-3xl p-6 text-center text-white shadow-xl mb-6 relative">
+        <span class="text-6xl block mb-2">${q.emoji}</span>
+        <h3 class="text-2xl font-black mb-3 font-hindi">${q.question}</h3>
+        <button onclick="speakText('${q.speak}', 'hi-IN')" class="px-4 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition-colors inline-flex items-center gap-1.5 font-hindi">
+          <i class="fa-solid fa-volume-high"></i> आवाज सुनें
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        ${q.options.map((opt, idx) => `
+          <button onclick="submitHindiAnswer(${idx}, ${q.answer}, this)"
+                  class="bg-white hover:bg-rose-50 text-slate-800 font-black text-3xl py-5 rounded-2xl border-2 border-slate-200 shadow-sm card-bounce font-hindi">
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function submitHindiAnswer(chosenIdx, correctIdx, btnEl) {
+  if (chosenIdx === correctIdx) {
+    hindiScore++;
+    btnEl.className = "bg-emerald-500 text-white font-black text-3xl py-5 rounded-2xl border-2 border-emerald-600 shadow-lg scale-105 font-hindi";
+    playSuccessSound();
+    addStars(1);
+    speakText("शाबाश! बहुत बढ़िया!", 'hi-IN');
+  } else {
+    btnEl.className = "bg-rose-500 text-white font-black text-3xl py-5 rounded-2xl border-2 border-rose-600 shadow-lg animate-bounce font-hindi";
+    playErrorSound();
+    speakText("फिर से कोशिश करें!", 'hi-IN');
+  }
+
+  setTimeout(() => {
+    currentHindiQIdx++;
+    renderHindiExercise(document.getElementById('contentContainer'));
+  }, 1200);
 }
 
 // --- 3. MATH VIEW RENDERER ---
