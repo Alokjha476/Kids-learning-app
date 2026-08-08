@@ -81,6 +81,11 @@
           <span class="text-xs font-semibold uppercase tracking-wider text-amber-800">Stars</span>
         </div>
 
+        <!-- Download APK Button -->
+        <a id="apkDownloadBtn" href="./MagicKidsLearning.apk" download="MagicKidsLearning.apk" class="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2.5 rounded-2xl shadow-sm transition-all" title="Download Android APK App">
+          <i class="fa-brands fa-android text-sm"></i> Download APK
+        </a>
+
         <!-- Mute / Unmute Button -->
         <button id="btnSoundToggle" onclick="toggleAudio()" class="w-12 h-12 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 flex items-center justify-center text-xl hover:bg-slate-100 transition-colors shadow-sm" title="Toggle Sound">
           <i class="fa-solid fa-volume-high" id="soundIcon"></i>
@@ -134,9 +139,11 @@
         💻 Developed by <span class="text-blue-600 font-extrabold">Alok Kumar</span> (Software Engineer)
       </div>
       <div class="flex items-center gap-4">
-        <button onclick="resetAppStars()" class="text-slate-400 hover:text-slate-600 underline">Reset Stars</button>
+        <a href="./MagicKidsLearning.apk" download="MagicKidsLearning.apk" class="text-emerald-600 font-extrabold hover:underline flex items-center gap-1.5">
+          <i class="fa-brands fa-android text-base"></i> Download APK App
+        </a>
         <span>•</span>
-        <span class="text-slate-500">100% Free &amp; Offline Ready</span>
+        <button onclick="resetAppStars()" class="text-slate-400 hover:text-slate-600 underline">Reset Stars</button>
       </div>
     </footer>
   </div>
