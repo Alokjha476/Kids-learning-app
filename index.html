@@ -82,7 +82,7 @@
         </div>
 
         <!-- Download APK Button -->
-        <a id="apkDownloadBtn" href="./MagicKidsLearning.apk" download="MagicKidsLearning.apk" class="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2.5 rounded-2xl shadow-sm transition-all" title="Download Android APK App">
+        <a id="apkDownloadBtn" href="./MagicKidsLearning.apk" download="MagicKidsLearning.apk" onclick="handleApkDownload(event)" class="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs px-3.5 py-2.5 rounded-2xl shadow-sm transition-all" title="Download Android APK App">
           <i class="fa-brands fa-android text-sm"></i> Download APK
         </a>
 
@@ -139,7 +139,7 @@
         💻 Developed by <span class="text-blue-600 font-extrabold">Alok Kumar</span> (Software Engineer)
       </div>
       <div class="flex items-center gap-4">
-        <a href="./MagicKidsLearning.apk" download="MagicKidsLearning.apk" class="text-emerald-600 font-extrabold hover:underline flex items-center gap-1.5">
+        <a href="./MagicKidsLearning.apk" download="MagicKidsLearning.apk" onclick="handleApkDownload(event)" class="text-emerald-600 font-extrabold hover:underline flex items-center gap-1.5">
           <i class="fa-brands fa-android text-base"></i> Download APK App
         </a>
         <span>•</span>
@@ -199,7 +199,7 @@
 
   <!-- Load Data & Main Logic -->
   <script src="data.js"></script>
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
