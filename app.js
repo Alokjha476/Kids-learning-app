@@ -292,7 +292,7 @@ function renderEnglishView(container) {
       
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         ${data.alphabets.map(item => `
-          <div onclick="speakText('${item.letter}. ${item.word}. Phonic sound ${item.phonic}'); openTracingModal('${item.letter}', '${item.word}', '${item.emoji}')"
+          <div onclick="speakText('${item.letter} for ${item.word}'); openTracingModal('${item.letter}', '${item.word}', '${item.emoji}')"
                class="bg-white rounded-3xl p-4 text-center border-2 border-slate-200 shadow-sm card-bounce cursor-pointer group hover:border-blue-400 flex flex-col items-center justify-between">
             <span class="text-5xl my-2 transform group-hover:scale-110 transition-transform">${item.emoji}</span>
             <div class="flex items-baseline gap-1">
@@ -892,7 +892,8 @@ function openTracingModal(symbol, word, emoji) {
 
   if (modal) modal.classList.remove('hidden');
   clearCanvas();
-  speakText(`${symbol}. ${word}`);
+  const textToSpeak = (symbol.length === 1 && /[A-Z]/i.test(symbol)) ? `${symbol} for ${word}` : `${symbol}. ${word}`;
+  speakText(textToSpeak);
 }
 
 function closeTracingModal() {
@@ -902,7 +903,10 @@ function closeTracingModal() {
 
 function playTargetSound() {
   if (currentTracingItem) {
-    speakText(`${currentTracingItem.symbol}. ${currentTracingItem.word}`);
+    const symbol = currentTracingItem.symbol;
+    const word = currentTracingItem.word;
+    const textToSpeak = (symbol.length === 1 && /[A-Z]/i.test(symbol)) ? `${symbol} for ${word}` : `${symbol}. ${word}`;
+    speakText(textToSpeak);
   }
 }
 
