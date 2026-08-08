@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kids-app-v1';
+const CACHE_NAME = 'kids-app-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -34,10 +34,17 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
+// Network First strategy (Always try network for latest changes, fallback to cache offline)
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      return cachedResponse || fetch(e.request);
-    })
+    fetch(e.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseClone));
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(e.request))
   );
 });

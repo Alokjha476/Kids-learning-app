@@ -531,7 +531,9 @@ function renderHindiView(container) {
 function renderMathView(container) {
   const data = KIDS_DATA.math[currentGrade];
 
-  if (currentSection === 'numbers' || currentSection === 'counting') {
+  if (currentSection === 'math_exercise') {
+    renderMathExercise(container);
+  } else if (currentSection === 'numbers' || currentSection === 'counting') {
     container.innerHTML = `
       <div class="mb-6">
         <h2 class="text-2xl font-black text-indigo-700">Numbers 1 to 20 &amp; Object Counting</h2>
@@ -578,7 +580,7 @@ function renderMathView(container) {
     `;
   } else if (currentSection === 'addition' || currentSection === 'subtraction') {
     const isAdd = currentSection === 'addition';
-    const list = isAdd ? data.addition : data.subtraction;
+    const list = isAdd ? (data.addition || []) : (data.subtraction || []);
     container.innerHTML = `
       <div class="mb-6">
         <h2 class="text-2xl font-black text-emerald-700">${isAdd ? 'Fun Visual Addition (+)' : 'Fun Visual Subtraction (-)'}</h2>
@@ -601,6 +603,40 @@ function renderMathView(container) {
         `).join('')}
       </div>
     `;
+  } else if (currentSection === 'multiplication' || currentSection === 'division') {
+    const isMult = currentSection === 'multiplication';
+    const list = isMult ? (data.multiplication || []) : (data.division || []);
+    const title = isMult ? 'Visual Multiplication (×)' : 'Visual Division (÷)';
+    container.innerHTML = `
+      <div class="mb-6">
+        <h2 class="text-2xl font-black text-blue-700">${title}</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        ${list.map(item => `
+          <div onclick="speakText('${item.text}')"
+               class="bg-white rounded-3xl p-5 border-2 border-blue-200 shadow-sm card-bounce cursor-pointer">
+            <div class="flex items-center justify-center gap-3 text-2xl font-black text-slate-800 mb-3">
+              ${isMult ? `
+                <span>${item.num1}</span>
+                <span class="text-blue-500">×</span>
+                <span>${item.num2}</span>
+                <span>=</span>
+                <span class="text-3xl text-blue-600 bg-blue-100 px-3 py-1 rounded-2xl">${item.prod}</span>
+              ` : `
+                <span>${item.total}</span>
+                <span class="text-purple-500">÷</span>
+                <span>${item.group}</span>
+                <span>=</span>
+                <span class="text-3xl text-purple-600 bg-purple-100 px-3 py-1 rounded-2xl">${item.ans}</span>
+              `}
+            </div>
+            <div class="bg-blue-50 rounded-2xl p-3 text-center text-sm font-semibold text-blue-900 flex items-center justify-center gap-2">
+              <span class="text-2xl">${item.item}</span> ${item.text}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
   } else if (currentSection === 'comparing' || currentSection === 'patterns') {
     if (currentSection === 'comparing') {
       container.innerHTML = `
@@ -608,7 +644,7 @@ function renderMathView(container) {
           <h2 class="text-2xl font-black text-amber-700">Comparing Numbers (&lt;, &gt;, =)</h2>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          ${data.comparison.map(item => `
+          ${(data.comparison || []).map(item => `
             <div onclick="speakText('${item.a} ${item.symbolText} ${item.b}')"
                  class="bg-white rounded-3xl p-5 border-2 border-amber-200 shadow-sm card-bounce cursor-pointer flex items-center justify-between">
               <div class="flex items-center gap-3 text-4xl font-black">
@@ -630,7 +666,7 @@ function renderMathView(container) {
           <h2 class="text-2xl font-black text-purple-700">Missing Number Trains 🚂</h2>
         </div>
         <div class="space-y-4">
-          ${data.patterns.map((item, idx) => `
+          ${(data.patterns || []).map((item, idx) => `
             <div class="bg-white rounded-3xl p-5 border-2 border-purple-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
               <div class="flex items-center gap-2 overflow-x-auto py-2">
                 ${item.train.map(val => val === null ? `
@@ -657,6 +693,170 @@ function renderMathView(container) {
       `;
     }
   }
+}
+
+// --- MATH EXERCISE ENGINE ---
+let selectedMathOp = 'all';
+let mathQuestions = [];
+let currentMathQIdx = 0;
+let mathScore = 0;
+
+function setMathOp(op) {
+  selectedMathOp = op;
+  playPopSound();
+  generateMathQuestions();
+  const container = document.getElementById('contentContainer');
+  if (container) renderMathExercise(container);
+}
+
+function generateMathQuestions() {
+  mathScore = 0;
+  currentMathQIdx = 0;
+  mathQuestions = [];
+
+  const ops = selectedMathOp === 'all' ? ['+', '-', '*', '/'] : [selectedMathOp];
+
+  for (let i = 0; i < 5; i++) {
+    const chosenOp = ops[Math.floor(Math.random() * ops.length)];
+    let n1, n2, ans, text, speakTextStr, opSymbol;
+
+    if (chosenOp === '+') {
+      n1 = Math.floor(Math.random() * 8) + 1;
+      n2 = Math.floor(Math.random() * 8) + 1;
+      ans = n1 + n2;
+      opSymbol = '+';
+      text = `${n1} + ${n2} = ?`;
+      speakTextStr = `What is ${n1} plus ${n2}?`;
+    } else if (chosenOp === '-') {
+      n1 = Math.floor(Math.random() * 8) + 3;
+      n2 = Math.floor(Math.random() * (n1 - 1)) + 1;
+      ans = n1 - n2;
+      opSymbol = '-';
+      text = `${n1} - ${n2} = ?`;
+      speakTextStr = `What is ${n1} minus ${n2}?`;
+    } else if (chosenOp === '*') {
+      n1 = Math.floor(Math.random() * 5) + 1;
+      n2 = Math.floor(Math.random() * 4) + 1;
+      ans = n1 * n2;
+      opSymbol = '×';
+      text = `${n1} × ${n2} = ?`;
+      speakTextStr = `What is ${n1} multiplied by ${n2}?`;
+    } else {
+      // Division
+      n2 = Math.floor(Math.random() * 4) + 1;
+      ans = Math.floor(Math.random() * 5) + 1;
+      n1 = n2 * ans;
+      opSymbol = '÷';
+      text = `${n1} ÷ ${n2} = ?`;
+      speakTextStr = `What is ${n1} divided by ${n2}?`;
+    }
+
+    // Generate 4 options
+    const optionsSet = new Set([ans]);
+    while (optionsSet.size < 4) {
+      const wrong = Math.max(0, ans + (Math.floor(Math.random() * 7) - 3));
+      if (wrong !== ans) optionsSet.add(wrong);
+    }
+    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+    mathQuestions.push({
+      n1, n2, ans, opSymbol, text, speakTextStr, options
+    });
+  }
+}
+
+function renderMathExercise(container) {
+  if (mathQuestions.length === 0) {
+    generateMathQuestions();
+  }
+
+  if (currentMathQIdx >= mathQuestions.length) {
+    playFanfareSound();
+    triggerConfetti();
+    addStars(5);
+
+    container.innerHTML = `
+      <div class="text-center py-10 max-w-md mx-auto">
+        <div class="text-7xl mb-4 animate-bounce">🧮</div>
+        <h2 class="text-3xl font-black text-emerald-600 mb-2">Math Exercise Complete!</h2>
+        <p class="text-slate-600 font-semibold mb-6">You solved ${mathScore} out of ${mathQuestions.length} math problems! You earned +5 Bonus Stars! ⭐</p>
+        <button onclick="generateMathQuestions(); renderMathExercise(document.getElementById('contentContainer'))"
+                class="btn-3d bg-gradient-to-r from-emerald-400 to-teal-600 text-white font-extrabold text-lg px-8 py-3.5 rounded-2xl shadow-lg hover:brightness-110">
+          Try Another Exercise ✏️
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  const q = mathQuestions[currentMathQIdx];
+  speakText(q.speakTextStr);
+
+  const opButtons = [
+    { id: 'all', name: 'All Mixed', icon: '🎲' },
+    { id: '+', name: 'Addition (+)', icon: '➕' },
+    { id: '-', name: 'Subtraction (-)', icon: '➖' },
+    { id: '*', name: 'Multiplication (×)', icon: '✖️' },
+    { id: '/', name: 'Division (÷)', icon: '➗' }
+  ];
+
+  container.innerHTML = `
+    <div class="max-w-xl mx-auto">
+      <!-- Operation Selector Pills -->
+      <div class="flex items-center justify-center gap-2 overflow-x-auto pb-4 mb-4">
+        ${opButtons.map(b => `
+          <button onclick="setMathOp('${b.id}')"
+                  class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold border-2 transition-all flex items-center gap-1.5 ${selectedMathOp === b.id ? 'bg-emerald-600 text-white border-emerald-600 shadow' : 'bg-white text-slate-700 hover:bg-slate-100 border-slate-200'}">
+            <span>${b.icon}</span> ${b.name}
+          </button>
+        `).join('')}
+      </div>
+
+      <!-- Exercise Progress Header -->
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs font-bold text-slate-500">Problem ${currentMathQIdx + 1} of ${mathQuestions.length}</span>
+        <span class="text-xs font-black text-amber-600 bg-amber-100 px-3 py-1 rounded-full">⭐ Score: ${mathScore}</span>
+      </div>
+
+      <!-- Big Math Question Card -->
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-8 text-center text-white shadow-xl mb-6 relative">
+        <span class="absolute top-4 left-4 bg-white/20 px-3 py-1 rounded-full text-xs font-black uppercase">Operation: ${q.opSymbol}</span>
+        <h3 class="text-5xl font-black tracking-wider mb-3">${q.text}</h3>
+        <button onclick="speakText('${q.speakTextStr}')" class="px-4 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition-colors inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-volume-high"></i> Replay Question
+        </button>
+      </div>
+
+      <!-- 4 Answer Options -->
+      <div class="grid grid-cols-2 gap-4">
+        ${q.options.map(opt => `
+          <button onclick="submitMathAnswer(${opt}, ${q.ans}, this)"
+                  class="bg-white hover:bg-emerald-50 text-slate-800 font-black text-3xl py-6 rounded-2xl border-2 border-slate-200 shadow-sm card-bounce">
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function submitMathAnswer(chosen, correct, btnEl) {
+  if (chosen === correct) {
+    mathScore++;
+    btnEl.className = "bg-emerald-500 text-white font-black text-3xl py-6 rounded-2xl border-2 border-emerald-600 shadow-lg scale-105";
+    playSuccessSound();
+    addStars(1);
+    speakText("Correct! Great math skills!");
+  } else {
+    btnEl.className = "bg-rose-500 text-white font-black text-3xl py-6 rounded-2xl border-2 border-rose-600 shadow-lg animate-bounce";
+    playErrorSound();
+    speakText("Oops! Try again.");
+  }
+
+  setTimeout(() => {
+    currentMathQIdx++;
+    renderMathExercise(document.getElementById('contentContainer'));
+  }, 1200);
 }
 
 function checkPatternAnswer(selected, correct, btnEl) {

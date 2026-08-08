@@ -210,6 +210,7 @@ const KIDS_DATA = {
       title: "LKG Mathematics",
       subtitle: "Numbers 1-20, Visual Counting, Shapes & Colors",
       sections: [
+        { id: "math_exercise", name: "Math Practice Exercise ✏️", icon: "📝" },
         { id: "numbers", name: "Numbers (1-20)", icon: "🔢" },
         { id: "counting", name: "Fun Object Counting", icon: "🧮" },
         { id: "shapes", name: "2D Shapes", icon: "📐" },
@@ -249,8 +250,11 @@ const KIDS_DATA = {
       title: "UKG Mathematics",
       subtitle: "Addition, Subtraction, Comparing & Number Patterns",
       sections: [
+        { id: "math_exercise", name: "Math Practice Exercise ✏️", icon: "📝" },
         { id: "addition", name: "Visual Addition (+)", icon: "➕" },
         { id: "subtraction", name: "Visual Subtraction (-)", icon: "➖" },
+        { id: "multiplication", name: "Multiplication (×)", icon: "✖️" },
+        { id: "division", name: "Division (÷)", icon: "➗" },
         { id: "comparing", name: "More or Less (< > =)", icon: "🐊" },
         { id: "patterns", name: "Missing Numbers", icon: "🚂" }
       ],
@@ -269,6 +273,22 @@ const KIDS_DATA = {
         { num1: 6, num2: 4, rem: 2, item: "🚗", text: "6 Cars - 4 parked = 2 left" },
         { num1: 8, num2: 3, rem: 5, item: "🐟", text: "8 Fish - 3 swam away = 5 left" },
         { num1: 10, num2: 5, rem: 5, item: "🍓", text: "10 Strawberries - 5 shared = 5 left" }
+      ],
+      multiplication: [
+        { num1: 2, num2: 2, prod: 4, item: "🍎", text: "2 groups of 2 Apples = 4 Apples (2 × 2 = 4)" },
+        { num1: 3, num2: 2, prod: 6, item: "🎈", text: "3 groups of 2 Balloons = 6 Balloons (3 × 2 = 6)" },
+        { num1: 4, num2: 2, prod: 8, item: "⭐", text: "4 groups of 2 Stars = 8 Stars (4 × 2 = 8)" },
+        { num1: 5, num2: 2, prod: 10, item: "🍬", text: "5 groups of 2 Candies = 10 Candies (5 × 2 = 10)" },
+        { num1: 3, num2: 3, prod: 9, item: "🍦", text: "3 groups of 3 Ice Creams = 9 (3 × 3 = 9)" },
+        { num1: 5, num2: 3, prod: 15, item: "🍓", text: "5 groups of 3 Strawberries = 15 (5 × 3 = 15)" }
+      ],
+      division: [
+        { total: 4, group: 2, ans: 2, item: "🍎", text: "4 Apples shared into 2 groups = 2 each (4 ÷ 2 = 2)" },
+        { total: 6, group: 2, ans: 3, item: "🎈", text: "6 Balloons shared into 2 groups = 3 each (6 ÷ 2 = 3)" },
+        { total: 8, group: 4, ans: 2, item: "⭐", text: "8 Stars shared into 4 groups = 2 each (8 ÷ 4 = 2)" },
+        { total: 10, group: 2, ans: 5, item: "🍬", text: "10 Candies shared into 2 groups = 5 each (10 ÷ 2 = 5)" },
+        { total: 9, group: 3, ans: 3, item: "🍦", text: "9 Ice Creams shared into 3 groups = 3 each (9 ÷ 3 = 3)" },
+        { total: 12, group: 3, ans: 4, item: "🍪", text: "12 Cookies shared into 3 groups = 4 each (12 ÷ 3 = 4)" }
       ],
       comparison: [
         { a: 5, b: 3, relation: ">", symbolText: "is Greater than", emoji: "🐊", explanation: "5 is bigger than 3! Crocodile eats 5." },
