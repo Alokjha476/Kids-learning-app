@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kids-app-v7';
+const CACHE_NAME = 'kids-app-v8';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

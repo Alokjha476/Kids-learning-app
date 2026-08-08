@@ -1505,11 +1505,5 @@ function setupCanvasListeners() {
 }
 
 function handleApkDownload(e) {
-  fetch('./MagicKidsLearning.apk', { method: 'HEAD' })
-    .then(res => {
-      if (!res.ok) {
-        alert("MagicKidsLearning.apk file GitHub par abhi upload nahi hui hai!\n\nPWABuilder.com par APK generate karke MagicKidsLearning.apk file ko apne GitHub repo me upload karein.");
-      }
-    })
-    .catch(() => {});
+  // Let browser natively handle download
 }
