@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="manifest" href="manifest.json">
+  <title>Magic Kids Learning App - LKG & UKG (English, Hindi, Math)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            kidsYellow: '#FCD34D',
+            kidsPink: '#F472B6',
+            kidsBlue: '#60A5FA',
+            kidsGreen: '#34D399',
+            kidsPurple: '#A78BFA',
+            kidsOrange: '#FB923C'
+          }
+        }
+      }
+    }
+  </script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800 antialiased selection:bg-yellow-300">
+
+  <!-- Animated Background Bubbles -->
+  <div class="bg-bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
+  <!-- Main App Shell -->
+  <div class="relative z-10 flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 py-4 sm:px-6">
+
+    <!-- Top Bar Navigation -->
+    <header class="glass-panel rounded-3xl p-4 mb-6 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-400 to-pink-500 flex items-center justify-center text-3xl shadow-md transform rotate-3 hover:rotate-0 transition-transform">
+          🎈
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+            Magic Kids Learning
+          </h1>
+          <p class="text-xs sm:text-sm font-semibold text-slate-500 flex items-center gap-2">
+            <span>For LKG & UKG Explorers</span>
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Grade Switcher (LKG vs UKG) -->
+      <div class="flex items-center bg-slate-200/80 p-1.5 rounded-2xl border border-slate-300/60 shadow-inner">
+        <button id="btnLkg" onclick="setGrade('lkg')" class="px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-all flex items-center gap-2">
+          <span>🐣</span> LKG Level
+        </button>
+        <button id="btnUkg" onclick="setGrade('ukg')" class="px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-all flex items-center gap-2">
+          <span>🚀</span> UKG Level
+        </button>
+      </div>
+
+      <!-- Rewards & Sound Controls -->
+      <div class="flex items-center gap-3">
+        <!-- Star Counter -->
+        <div class="bg-amber-100 border-2 border-amber-300 px-4 py-2 rounded-2xl flex items-center gap-2 font-black text-amber-700 shadow-sm pop-pulse">
+          <span class="text-2xl">⭐</span>
+          <span id="starBadgeCount" class="text-xl">0</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-amber-800">Stars</span>
+        </div>
+
+        <!-- Mute / Unmute Button -->
+        <button id="btnSoundToggle" onclick="toggleAudio()" class="w-12 h-12 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 flex items-center justify-center text-xl hover:bg-slate-100 transition-colors shadow-sm" title="Toggle Sound">
+          <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs (Subjects) -->
+    <nav class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <button onclick="setSubject('english')" id="tabEnglish" class="subject-tab glass-panel rounded-2xl p-4 text-center transition-all card-bounce flex flex-col items-center justify-center gap-1 border-2">
+        <span class="text-3xl sm:text-4xl mb-1">🔤</span>
+        <span class="font-extrabold text-base sm:text-lg">English</span>
+        <span class="text-xs font-medium text-slate-500">Alphabets & Words</span>
+      </button>
+
+      <button onclick="setSubject('hindi')" id="tabHindi" class="subject-tab glass-panel rounded-2xl p-4 text-center transition-all card-bounce flex flex-col items-center justify-center gap-1 border-2">
+        <span class="text-3xl sm:text-4xl mb-1">🕉️</span>
+        <span class="font-extrabold text-base sm:text-lg font-hindi">हिंदी (Hindi)</span>
+        <span class="text-xs font-medium text-slate-500">स्वर व व्यंजन</span>
+      </button>
+
+      <button onclick="setSubject('math')" id="tabMath" class="subject-tab glass-panel rounded-2xl p-4 text-center transition-all card-bounce flex flex-col items-center justify-center gap-1 border-2">
+        <span class="text-3xl sm:text-4xl mb-1">🔢</span>
+        <span class="font-extrabold text-base sm:text-lg">Mathematics</span>
+        <span class="text-xs font-medium text-slate-500">Numbers & Shapes</span>
+      </button>
+
+      <button onclick="openQuizMode()" id="tabQuiz" class="subject-tab glass-panel rounded-2xl p-4 text-center transition-all card-bounce flex flex-col items-center justify-center gap-1 border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50">
+        <span class="text-3xl sm:text-4xl mb-1">🎮</span>
+        <span class="font-extrabold text-base sm:text-lg text-amber-700">Fun Quiz Game</span>
+        <span class="text-xs font-semibold text-amber-600">Earn ⭐ Rewards!</span>
+      </button>
+    </nav>
+
+    <!-- Sub-Section Pills (e.g., Alphabets | Phonics | Tracing) -->
+    <div id="sectionPillsContainer" class="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar">
+      <!-- Injected dynamically by app.js -->
+    </div>
+
+    <!-- Active View Area -->
+    <main id="contentContainer" class="flex-1 glass-panel rounded-3xl p-4 sm:p-6 shadow-xl border-2 border-white/80 min-h-[450px] relative">
+      <!-- Content (Cards / Tracing Canvas / Quiz) render here -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-8 py-4 text-center text-xs sm:text-sm text-slate-500 font-medium flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-slate-200">
+      <div>
+        🌈 Designed for LKG &amp; UKG Early Childhood Education
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="resetAppStars()" class="text-slate-400 hover:text-slate-600 underline">Reset Stars</button>
+        <span>•</span>
+        <span class="text-slate-500">100% Free &amp; Offline Ready</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Tracing Canvas Modal / Full View Container Template -->
+  <div id="tracingModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl relative flex flex-col items-center">
+      
+      <button onclick="closeTracingModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-600 font-bold text-xl flex items-center justify-center transition-colors">
+        ✕
+      </button>
+
+      <div class="text-center mb-4">
+        <h3 id="tracingTargetTitle" class="text-2xl font-extrabold text-blue-600">Trace the Letter</h3>
+        <p class="text-sm text-slate-500">Use your finger or mouse to draw over the guide!</p>
+      </div>
+
+      <!-- Canvas Box -->
+      <div class="relative border-4 border-dashed border-blue-300 rounded-3xl overflow-hidden shadow-inner bg-white">
+        <!-- Canvas Background Watermark Guide -->
+        <div id="tracingWatermark" class="absolute inset-0 flex items-center justify-center text-slate-200 text-9xl font-black select-none pointer-events-none">
+          A
+        </div>
+        <canvas id="drawingCanvas" width="340" height="340" class="relative z-10 rounded-2xl"></canvas>
+      </div>
+
+      <!-- Color Palette & Tools -->
+      <div class="flex flex-wrap items-center justify-between w-full max-w-md mt-6 gap-3">
+        <!-- Colors -->
+        <div class="flex items-center gap-2">
+          <button onclick="setBrushColor('#ef4444')" class="w-8 h-8 rounded-full bg-red-500 border-2 border-white shadow hover:scale-110 transition-transform"></button>
+          <button onclick="setBrushColor('#3b82f6')" class="w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow hover:scale-110 transition-transform"></button>
+          <button onclick="setBrushColor('#10b981')" class="w-8 h-8 rounded-full bg-emerald-500 border-2 border-white shadow hover:scale-110 transition-transform"></button>
+          <button onclick="setBrushColor('#f59e0b')" class="w-8 h-8 rounded-full bg-amber-500 border-2 border-white shadow hover:scale-110 transition-transform"></button>
+          <button onclick="setBrushColor('#8b5cf6')" class="w-8 h-8 rounded-full bg-purple-500 border-2 border-white shadow hover:scale-110 transition-transform"></button>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center gap-2">
+          <button onclick="playTargetSound()" class="px-4 py-2 rounded-xl bg-blue-100 text-blue-700 font-bold hover:bg-blue-200 transition-colors flex items-center gap-1.5 text-sm">
+            <i class="fa-solid fa-volume-high"></i> Hear Sound
+          </button>
+          <button onclick="clearCanvas()" class="px-4 py-2 rounded-xl bg-rose-100 text-rose-700 font-bold hover:bg-rose-200 transition-colors flex items-center gap-1.5 text-sm">
+            <i class="fa-solid fa-eraser"></i> Clear
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Celebration Confetti Container -->
+  <div id="confettiContainer" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+
+  <!-- Load Data & Main Logic -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

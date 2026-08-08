@@ -1,0 +1,140 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&family=Baloo+2:wght@600;700;800&display=swap');
+
+:root {
+  --font-kids: 'Fredoka', 'Quicksand', system-ui, sans-serif;
+  --font-hindi: 'Baloo 2', 'Fredoka', sans-serif;
+}
+
+body {
+  font-family: var(--font-kids);
+  background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #fef3c7 100%);
+  min-height: 100vh;
+  color: #1e293b;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Hindi Text Custom Font */
+.font-hindi {
+  font-family: var(--font-hindi);
+}
+
+/* Floating animated background shapes */
+.bg-bubbles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.25;
+  animation: floatUp 15s infinite linear;
+}
+
+.bubble:nth-child(1) { width: 90px; height: 90px; background: #f472b6; left: 10%; animation-duration: 18s; }
+.bubble:nth-child(2) { width: 120px; height: 120px; background: #60a5fa; left: 30%; animation-duration: 22s; animation-delay: 2s; }
+.bubble:nth-child(3) { width: 70px; height: 70px; background: #fbbf24; left: 60%; animation-duration: 14s; animation-delay: 1s; }
+.bubble:nth-child(4) { width: 110px; height: 110px; background: #34d399; left: 80%; animation-duration: 20s; animation-delay: 3s; }
+.bubble:nth-child(5) { width: 85px; height: 85px; background: #a78bfa; left: 90%; animation-duration: 16s; animation-delay: 4s; }
+
+@keyframes floatUp {
+  0% { transform: translateY(105vh) rotate(0deg); }
+  100% { transform: translateY(-15vh) rotate(360deg); }
+}
+
+/* Card hover animation */
+.card-bounce {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.card-bounce:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.card-bounce:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* Shimmer pulse effect for interactive items */
+@keyframes popPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.pop-pulse {
+  animation: popPulse 2s infinite ease-in-out;
+}
+
+/* Confetti particles */
+.confetti-particle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -10px;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: fall 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(80vh) rotate(720deg); opacity: 0; }
+}
+
+/* Custom Scrollbar for Flashcards grid */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Drawing Canvas styling */
+#drawingCanvas {
+  touch-action: none;
+  cursor: crosshair;
+  background-color: #ffffff;
+}
+
+/* Glassmorphism containers */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Custom tab active underline */
+.tab-active {
+  background-color: #ffffff !important;
+  color: #2563eb !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Big playful button shadow */
+.btn-3d {
+  transition: all 0.15s ease;
+  box-shadow: 0 6px 0 0 rgba(0, 0, 0, 0.15);
+}
+
+.btn-3d:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.15);
+}
