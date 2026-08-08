@@ -218,12 +218,24 @@ function renderSubjectTabs() {
   const tabs = ['English', 'Hindi', 'Math', 'Quiz'];
   tabs.forEach(t => {
     const el = document.getElementById(`tab${t}`);
-    if (!el) return;
     const isCurrent = (currentSubject.toLowerCase() === t.toLowerCase()) || (t === 'Quiz' && currentSubject === 'quiz');
-    if (isCurrent) {
-      el.classList.add('ring-4', 'ring-blue-400', 'bg-white', 'scale-105', 'shadow-xl');
-    } else {
-      el.classList.remove('ring-4', 'ring-blue-400', 'bg-white', 'scale-105', 'shadow-xl');
+    if (el) {
+      if (isCurrent) {
+        el.classList.add('ring-4', 'ring-blue-400', 'bg-white', 'scale-105', 'shadow-xl');
+      } else {
+        el.classList.remove('ring-4', 'ring-blue-400', 'bg-white', 'scale-105', 'shadow-xl');
+      }
+    }
+
+    const mobileEl = document.getElementById(`mobileTab${t}`);
+    if (mobileEl) {
+      if (isCurrent) {
+        mobileEl.classList.add('active', 'text-blue-600', 'scale-105');
+        mobileEl.classList.remove('text-slate-500');
+      } else {
+        mobileEl.classList.remove('active', 'text-blue-600', 'scale-105');
+        if (t !== 'Quiz') mobileEl.classList.add('text-slate-500');
+      }
     }
   });
 }
@@ -1485,8 +1497,13 @@ function setupCanvasListeners() {
     e.preventDefault();
 
     const rect = canvas.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     ctx.strokeStyle = brushColor;
     ctx.lineTo(x, y);
