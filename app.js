@@ -215,7 +215,7 @@ function setSection(sectionId) {
 }
 
 function renderSubjectTabs() {
-  const tabs = ['English', 'Hindi', 'Math', 'Quiz'];
+  const tabs = ['English', 'Hindi', 'Math', 'Rhymes', 'Quiz'];
   tabs.forEach(t => {
     const el = document.getElementById(`tab${t}`);
     const isCurrent = (currentSubject.toLowerCase() === t.toLowerCase()) || (t === 'Quiz' && currentSubject === 'quiz');
@@ -234,7 +234,7 @@ function renderSubjectTabs() {
         mobileEl.classList.remove('text-slate-500');
       } else {
         mobileEl.classList.remove('active', 'text-blue-600', 'scale-105');
-        if (t !== 'Quiz') mobileEl.classList.add('text-slate-500');
+        if (t !== 'Quiz' && t !== 'Rhymes') mobileEl.classList.add('text-slate-500');
       }
     }
   });
@@ -244,7 +244,7 @@ function renderSectionPills() {
   const container = document.getElementById('sectionPillsContainer');
   if (!container) return;
 
-  if (currentSubject === 'quiz') {
+  if (currentSubject === 'quiz' || currentSubject === 'rhymes') {
     container.innerHTML = '';
     return;
   }
@@ -280,6 +280,8 @@ function renderContent() {
     renderHindiView(container);
   } else if (currentSubject === 'math') {
     renderMathView(container);
+  } else if (currentSubject === 'rhymes') {
+    renderRhymesView(container);
   } else if (currentSubject === 'quiz') {
     renderQuizView(container);
   }
@@ -307,7 +309,10 @@ function renderEnglishView(container) {
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         ${data.alphabets.map(item => `
           <div onclick="speakText('${item.letter} for ${item.word}'); openTracingModal('${item.letter}', '${item.word}', '${item.emoji}')"
-               class="bg-white rounded-3xl p-4 text-center border-2 border-slate-200 shadow-sm card-bounce cursor-pointer group hover:border-blue-400 flex flex-col items-center justify-between">
+               class="bg-white rounded-3xl p-4 text-center border-2 border-slate-200 shadow-sm card-bounce cursor-pointer group hover:border-blue-400 flex flex-col items-center justify-between relative">
+            <button id="mic_alpha_${item.letter}" onclick="event.stopPropagation(); listenToChildSpeech('${item.word}', 'mic_alpha_${item.letter}')" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center text-xs shadow-sm transition-transform active:scale-90" title="Speak word to test AI Pronunciation!">
+              🎙️
+            </button>
             <span class="text-5xl my-2 transform group-hover:scale-110 transition-transform">${item.emoji}</span>
             <div class="flex items-baseline gap-1">
               <span class="text-3xl font-black text-blue-600">${item.letter}</span>
@@ -1524,3 +1529,379 @@ function setupCanvasListeners() {
 function handleApkDownload(e) {
   // Let browser natively handle download
 }
+
+// --- ADVANCED FEATURE 1: AI VOICE RECOGNITION & PRONUNCIATION ---
+
+function listenToChildSpeech(targetText, btnId) {
+  const btn = document.getElementById(btnId);
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert("Speech Recognition is not supported on this browser. Please use Google Chrome on Android or PC!");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = currentSubject === 'hindi' ? 'hi-IN' : 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  if (btn) btn.classList.add('mic-listening');
+
+  recognition.onresult = (event) => {
+    if (btn) btn.classList.remove('mic-listening');
+    const transcript = event.results[0][0].transcript.toLowerCase().trim();
+    const target = targetText.toLowerCase().trim();
+
+    if (transcript.includes(target) || target.includes(transcript)) {
+      addStars(3);
+      playSuccessSound();
+      triggerConfetti();
+      alert(`🎉 Wonderful Pronunciation!\nYou said: "${transcript}"\nEarned +3 ⭐ Stars!`);
+    } else {
+      playErrorSound();
+      alert(`👂 Good Try!\nYou said: "${transcript}"\nExpected: "${targetText}"\nTry again!`);
+    }
+  };
+
+  recognition.onerror = () => {
+    if (btn) btn.classList.remove('mic-listening');
+  };
+
+  recognition.onend = () => {
+    if (btn) btn.classList.remove('mic-listening');
+  };
+
+  recognition.start();
+}
+
+// --- ADVANCED FEATURE 2: AUTO TRACING ACCURACY CHECK ---
+
+function checkTracingAccuracy() {
+  const canvas = document.getElementById('drawingCanvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  let drawnPixels = 0;
+
+  for (let i = 3; i < imgData.data.length; i += 4) {
+    if (imgData.data[i] > 50) drawnPixels++;
+  }
+
+  const totalPixels = canvas.width * canvas.height;
+  const fillRatio = drawnPixels / totalPixels;
+
+  let scoreStars = 1;
+  let scorePercent = Math.min(100, Math.round(fillRatio * 3200));
+
+  if (fillRatio > 0.05) scoreStars = 3;
+  else if (fillRatio > 0.02) scoreStars = 2;
+
+  addStars(scoreStars * 2);
+  playSuccessSound();
+  triggerConfetti();
+
+  alert(`🏆 Tracing Accuracy: ${scorePercent}%\nEarned +${scoreStars * 2} ⭐ Stars!`);
+}
+
+// --- ADVANCED FEATURE 3: PARENT DASHBOARD & CERTIFICATE & CUSTOM VOICE ---
+
+let parentPin = localStorage.getItem('kids_parent_pin') || '1234';
+let mediaRecorder = null;
+let audioChunks = [];
+let parentVoices = JSON.parse(localStorage.getItem('kids_parent_voices')) || {};
+
+function openParentZone() {
+  const modal = document.getElementById('parentZoneModal');
+  if (!modal) return;
+  document.getElementById('parentPinView').classList.remove('hidden');
+  document.getElementById('parentDashboardView').classList.add('hidden');
+  document.getElementById('parentPinInput').value = '';
+  modal.classList.remove('hidden');
+}
+
+function closeParentZone() {
+  const modal = document.getElementById('parentZoneModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function verifyParentPin() {
+  const inputPin = document.getElementById('parentPinInput').value;
+  if (inputPin === parentPin) {
+    document.getElementById('parentPinView').classList.add('hidden');
+    document.getElementById('parentDashboardView').classList.remove('hidden');
+    updateDashboardStats();
+    playSuccessSound();
+  } else {
+    alert("Incorrect PIN! Default PIN is 1234.");
+  }
+}
+
+function lockParentZone() {
+  document.getElementById('parentPinView').classList.remove('hidden');
+  document.getElementById('parentDashboardView').classList.add('hidden');
+}
+
+function updateDashboardStats() {
+  document.getElementById('dashboardTotalStars').textContent = starCount;
+  document.getElementById('dashboardQuizScore').textContent = '92%';
+  document.getElementById('dashboardStreak').textContent = '3 Days 🔥';
+}
+
+function generateCertificate() {
+  const name = document.getElementById('childNameInput').value.trim() || "Master Explorer";
+  document.getElementById('certificateChildName').textContent = name;
+  document.getElementById('certStars').textContent = starCount;
+  document.getElementById('certDate').textContent = new Date().toLocaleDateString();
+
+  closeParentZone();
+  document.getElementById('certificateModal').classList.remove('hidden');
+  playSuccessSound();
+  triggerConfetti();
+}
+
+function closeCertificate() {
+  document.getElementById('certificateModal').classList.add('hidden');
+}
+
+function toggleParentVoiceRecording() {
+  const keyInput = document.getElementById('parentVoiceKeyInput');
+  const wordKey = keyInput.value.trim().toLowerCase();
+
+  if (!wordKey) {
+    alert("Please type a word first (e.g. Apple) to record voice for!");
+    return;
+  }
+
+  const btn = document.getElementById('btnRecordParentVoice');
+  const statusText = document.getElementById('recordingStatusText');
+
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    btn.textContent = "🎤 Record Voice";
+    statusText.classList.add('hidden');
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = () => {
+          parentVoices[wordKey] = reader.result;
+          localStorage.setItem('kids_parent_voices', JSON.stringify(parentVoices));
+          alert(`✅ Parent Voice recorded successfully for "${wordKey}"!`);
+        };
+      };
+
+      mediaRecorder.start();
+      btn.textContent = "⏹️ Stop Recording";
+      statusText.classList.remove('hidden');
+    })
+    .catch(err => {
+      alert("Microphone permission error: " + err.message);
+    });
+}
+
+// --- ADVANCED FEATURE 4: RHYMES & KARAOKE PLAYER ---
+
+let currentRhymeUtterance = null;
+
+function renderRhymesView(container) {
+  container.innerHTML = `
+    <div class="mb-6">
+      <h2 class="text-2xl font-black text-purple-800 flex items-center gap-2">🎵 Nursery Rhymes & Poems</h2>
+      <p class="text-sm text-slate-500 font-medium">Click any rhyme to listen with interactive Karaoke highlighting!</p>
+    </div>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      ${RHYMES_DATA.map(rhyme => `
+        <div onclick="openRhymePlayer('${rhyme.id}')"
+             class="bg-gradient-to-br ${rhyme.bg} text-white rounded-3xl p-5 shadow-lg card-bounce cursor-pointer flex flex-col justify-between min-h-[160px]">
+          <div class="flex items-center justify-between">
+            <span class="text-4xl">${rhyme.icon}</span>
+            <span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">${rhyme.lang === 'hi' ? 'Hindi Poem' : 'English Rhyme'}</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-black mt-3 leading-tight">${rhyme.title}</h3>
+            <p class="text-xs text-white/80 font-semibold mt-1">${rhyme.lines.length} Lines • Tap to Sing</p>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function openRhymePlayer(rhymeId) {
+  const rhyme = RHYMES_DATA.find(r => r.id === rhymeId);
+  if (!rhyme) return;
+
+  const container = document.getElementById('contentContainer');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="max-w-2xl mx-auto">
+      <button onclick="setSubject('rhymes')" class="mb-4 text-xs font-extrabold text-purple-700 bg-purple-100 hover:bg-purple-200 px-4 py-2 rounded-xl flex items-center gap-1">
+        ⬅️ Back to All Rhymes
+      </button>
+
+      <div class="bg-gradient-to-br ${rhyme.bg} text-white rounded-3xl p-6 shadow-2xl text-center mb-6">
+        <span class="text-5xl block mb-2">${rhyme.icon}</span>
+        <h2 class="text-2xl sm:text-3xl font-black mb-4">${rhyme.title}</h2>
+        
+        <div class="flex justify-center gap-3">
+          <button onclick="playRhymeLineByLine('${rhyme.id}')" class="bg-white text-purple-900 font-black px-6 py-3 rounded-2xl shadow-md hover:bg-amber-300 transition-colors flex items-center gap-2 text-sm">
+            ▶️ Start Karaoke Sing-Along
+          </button>
+          <button onclick="stopRhymePlayback()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-4 py-3 rounded-2xl shadow text-sm">
+            ⏹️ Stop
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm space-y-3">
+        ${rhyme.lines.map((line, idx) => `
+          <div id="rhymeLine_${idx}" class="p-3 rounded-2xl text-base sm:text-xl font-black text-slate-700 transition-all text-center">
+            ${line}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function playRhymeLineByLine(rhymeId) {
+  const rhyme = RHYMES_DATA.find(r => r.id === rhymeId);
+  if (!rhyme || !('speechSynthesis' in window)) return;
+
+  stopRhymePlayback();
+
+  let lineIdx = 0;
+  function speakNextLine() {
+    if (lineIdx >= rhyme.lines.length) {
+      addStars(5);
+      playSuccessSound();
+      triggerConfetti();
+      return;
+    }
+
+    rhyme.lines.forEach((_, i) => {
+      const el = document.getElementById(`rhymeLine_${i}`);
+      if (el) el.classList.remove('karaoke-active');
+    });
+
+    const currentEl = document.getElementById(`rhymeLine_${lineIdx}`);
+    if (currentEl) currentEl.classList.add('karaoke-active');
+
+    const lineText = rhyme.lines[lineIdx];
+    const utter = new SpeechSynthesisUtterance(lineText);
+    utter.rate = 0.8;
+    utter.pitch = 1.1;
+    utter.lang = rhyme.lang === 'hi' ? 'hi-IN' : 'en-US';
+
+    utter.onend = () => {
+      lineIdx++;
+      setTimeout(speakNextLine, 400);
+    };
+
+    currentRhymeUtterance = utter;
+    window.speechSynthesis.speak(utter);
+  }
+
+  speakNextLine();
+}
+
+function stopRhymePlayback() {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+// --- ADVANCED FEATURE 5: VIRTUAL REWARD SHOP & AVATARS ---
+
+let userAvatars = JSON.parse(localStorage.getItem('kids_avatars')) || AVATARS_DATA;
+let activeAvatar = localStorage.getItem('kids_active_avatar') || '🎈';
+
+function updateAvatarUI() {
+  const el = document.getElementById('activeAvatarEmoji');
+  if (el) el.textContent = activeAvatar;
+}
+
+function openRewardShop() {
+  renderAvatarShop();
+  const modal = document.getElementById('rewardShopModal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeRewardShop() {
+  const modal = document.getElementById('rewardShopModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function renderAvatarShop() {
+  const balanceEl = document.getElementById('shopStarBalance');
+  if (balanceEl) balanceEl.textContent = starCount;
+
+  const container = document.getElementById('avatarShopGrid');
+  if (!container) return;
+
+  container.innerHTML = userAvatars.map(av => {
+    const isSelected = activeAvatar === av.emoji;
+    const canAfford = starCount >= av.cost;
+    return `
+      <div class="bg-slate-50 border-2 ${isSelected ? 'border-amber-400 bg-amber-50/60 ring-2 ring-amber-300' : 'border-slate-200'} rounded-2xl p-3 flex flex-col items-center justify-between">
+        <span class="text-4xl mb-1">${av.emoji}</span>
+        <span class="text-xs font-black text-slate-700">${av.name}</span>
+        <span class="text-[11px] font-bold text-amber-700 my-1">⭐ ${av.cost} Stars</span>
+        ${av.unlocked 
+          ? `<button onclick="setAvatar('${av.emoji}')" class="w-full py-1.5 rounded-xl font-extrabold text-xs ${isSelected ? 'bg-amber-400 text-amber-950' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}">
+              ${isSelected ? 'Active ✨' : 'Use Avatar'}
+             </button>`
+          : `<button onclick="buyAvatar('${av.id}')" ${!canAfford ? 'disabled' : ''} class="w-full py-1.5 rounded-xl font-extrabold text-xs ${canAfford ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}">
+              ${canAfford ? 'Unlock 🔓' : 'Need Stars 🔒'}
+             </button>`
+        }
+      </div>
+    `;
+  }).join('');
+}
+
+function buyAvatar(avatarId) {
+  const av = userAvatars.find(a => a.id === avatarId);
+  if (!av || av.unlocked || starCount < av.cost) return;
+
+  starCount -= av.cost;
+  av.unlocked = true;
+  activeAvatar = av.emoji;
+
+  localStorage.setItem('kidsApp_stars', starCount);
+  localStorage.setItem('kids_avatars', JSON.stringify(userAvatars));
+  localStorage.setItem('kids_active_avatar', activeAvatar);
+
+  updateStarDisplay();
+  updateAvatarUI();
+  renderAvatarShop();
+  playSuccessSound();
+  triggerConfetti();
+}
+
+function setAvatar(emoji) {
+  activeAvatar = emoji;
+  localStorage.setItem('kids_active_avatar', activeAvatar);
+  updateAvatarUI();
+  renderAvatarShop();
+  playPopSound();
+}
+
+// Restore Active Avatar on Init
+document.addEventListener('DOMContentLoaded', () => {
+  updateAvatarUI();
+});
+

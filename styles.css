@@ -188,3 +188,41 @@ body {
   transform: translateY(-2px);
 }
 
+/* AI Voice Mic Listening Animation */
+@keyframes micPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); transform: scale(1); }
+  50% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); transform: scale(1.15); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(1); }
+}
+
+.mic-listening {
+  animation: micPulse 1.2s infinite ease-in-out;
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+/* Karaoke Lyrics Active Line Highlight */
+.karaoke-active {
+  background: linear-gradient(90deg, #fef08a 0%, #fde047 100%);
+  color: #854d0e !important;
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
+}
+
+/* Certificate Print View Styling */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #certificateContainer, #certificateContainer * {
+    visibility: visible;
+  }
+  #certificateContainer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+

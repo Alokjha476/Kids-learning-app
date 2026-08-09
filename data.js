@@ -313,3 +313,98 @@ const KIDS_DATA = {
     }
   }
 };
+
+const RHYMES_DATA = [
+  {
+    id: "twinkle",
+    title: "Twinkle Twinkle Little Star",
+    lang: "en",
+    icon: "⭐",
+    bg: "from-blue-500 to-indigo-700",
+    lines: [
+      "Twinkle, twinkle, little star,",
+      "How I wonder what you are!",
+      "Up above the world so high,",
+      "Like a diamond in the sky.",
+      "Twinkle, twinkle, little star,",
+      "How I wonder what you are!"
+    ]
+  },
+  {
+    id: "johny",
+    title: "Johny Johny Yes Papa",
+    lang: "en",
+    icon: "👦",
+    bg: "from-amber-400 to-pink-500",
+    lines: [
+      "Johny, Johny, Yes Papa?",
+      "Eating sugar? No, Papa!",
+      "Telling lies? No, Papa!",
+      "Open your mouth, Ha! Ha! Ha!"
+    ]
+  },
+  {
+    id: "baa_baa",
+    title: "Baa Baa Black Sheep",
+    lang: "en",
+    icon: "🐑",
+    bg: "from-purple-500 to-pink-600",
+    lines: [
+      "Baa, baa, black sheep, have you any wool?",
+      "Yes sir, yes sir, three bags full.",
+      "One for the master, and one for the dame,",
+      "And one for the little boy who lives down the lane."
+    ]
+  },
+  {
+    id: "machhli",
+    title: "मछली जल की रानी है (Fish Poem)",
+    lang: "hi",
+    icon: "🐟",
+    bg: "from-cyan-500 to-blue-600",
+    lines: [
+      "मछली जल की रानी है,",
+      "जीवन उसका पानी है।",
+      "हाथ लगाओ तो डर जाएगी,",
+      "बाहर निकालो तो मर जाएगी!"
+    ]
+  },
+  {
+    id: "chanda_mama",
+    title: "चंदा मामा दूर के (Moon Poem)",
+    lang: "hi",
+    icon: "🌙",
+    bg: "from-indigo-600 to-purple-800",
+    lines: [
+      "चंदा मामा दूर के,",
+      "पुए पकाएं बूर के।",
+      "आप खाएं थाली में,",
+      "मुन्ने को दें प्याली में।",
+      "प्याली गई टूट,",
+      "मुन्ना गया रूठ!"
+    ]
+  },
+  {
+    id: "lakdi_kathi",
+    title: "लकड़ी की काठी (Wooden Horse Poem)",
+    lang: "hi",
+    icon: "🐴",
+    bg: "from-emerald-500 to-teal-700",
+    lines: [
+      "लकड़ी की काठी, काठी पे घोड़ा,",
+      "घोड़े की दुम पे जो मारा हथौड़ा।",
+      "दौड़ा दौड़ा दौड़ा घोड़ा दुम उठा के दौड़ा!"
+    ]
+  }
+];
+
+const AVATARS_DATA = [
+  { id: "balloon", emoji: "🎈", name: "Party Balloon", cost: 0, unlocked: true },
+  { id: "fox", emoji: "🦊", name: "Clever Fox", cost: 10, unlocked: false },
+  { id: "rocket", emoji: "🚀", name: "Space Rocket", cost: 25, unlocked: false },
+  { id: "crown", emoji: "👑", name: "Royal Crown", cost: 50, unlocked: false },
+  { id: "unicorn", emoji: "🦄", name: "Magic Unicorn", cost: 75, unlocked: false },
+  { id: "dino", emoji: "🦖", name: "Dino Explorer", cost: 100, unlocked: false },
+  { id: "superhero", emoji: "🦸", name: "Super Hero", cost: 150, unlocked: false }
+];
+
