@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "io.github.alokjha476.twa",
-        "sha256_cert_fingerprints": ["29:59:6C:61:84:EA:7D:F9:50:ED:21:0A:E1:79:7B:CB:F0:09:8B:D0:47:D3:32:4C:19:D0:AC:63:8E:7B:4B:18"]
+        "sha256_cert_fingerprints": ["86:1E:08:14:43:E5:90:AC:C8:82:22:08:4D:EA:87:EB:5C:83:6D:E8:39:79:A7:2B:6D:F8:D2:B5:8C:79:6F:90"]
       }
     }]
